@@ -1,0 +1,70 @@
+"""Información que el sitio revela de más y problemas visibles en el HTML."""
+
+import re
+
+from selectolax.lexbor import LexborHTMLParser
+
+from escaner.modelos import Hallazgo, Severidad
+from escaner.revisiones.base import Revision, Sitio
+
+CON_VERSION = re.compile(r"\d+\.\d+")
+JQUERY = re.compile(r"jquery[.-]?(\d+)\.(\d+)\.(\d+)", re.I)
+
+
+class Divulgacion(Revision):
+    id = "divulgacion"
+    nombre = "Información expuesta y contenido de la página"
+
+    async def ejecutar(self, sitio: Sitio, cliente) -> list[Hallazgo]:
+        r = sitio.inicio
+        h: list[Hallazgo] = []
+
+        def agregar(titulo, severidad, descripcion, recomendacion, evidencia, referencias=()):
+            h.append(Hallazgo(revision=self.id, titulo=titulo, severidad=severidad, url=sitio.url, descripcion=descripcion,
+                              recomendacion=recomendacion, evidencia=evidencia, referencias=list(referencias)))
+
+        for cabecera in ("server", "x-powered-by", "x-aspnet-version", "x-aspnetmvc-version"):
+            valor = r.cabeceras.get(cabecera)
+            if valor and (cabecera != "server" or CON_VERSION.search(valor)):
+                agregar(f"El servidor revela su software ({cabecera})", Severidad.BAJA,
+                        "Conocer la versión exacta ayuda a un atacante a buscar fallas conocidas para ese software.",
+                        "Quitar la cabecera o la versión (por ejemplo, server_tokens off en nginx, expose_php = Off en PHP).",
+                        f"{cabecera}: {valor}")
+
+        if not r.es_html:
+            return h
+        html = LexborHTMLParser(r.texto)
+
+        titulo = html.css_first("title")
+        if titulo and titulo.text().strip().startswith("Index of /"):
+            agregar("Listado de directorio activado", Severidad.MEDIA,
+                    "Cualquiera puede ver todos los archivos de la carpeta.",
+                    "Desactivar el listado (Options -Indexes en Apache, autoindex off en nginx).", titulo.text().strip())
+
+        if sitio.es_https:
+            mixto = [n.attributes.get("src") or n.attributes.get("href")
+                     for n in html.css("script[src], iframe[src], link[rel=stylesheet][href]")
+                     if (n.attributes.get("src") or n.attributes.get("href") or "").startswith("http://")]
+            if mixto:
+                agregar("Contenido mixto (recursos por HTTP en una página HTTPS)", Severidad.MEDIA,
+                        "Scripts o estilos cargados sin cifrar pueden ser modificados en el camino.",
+                        "Cargar todos los recursos por https://.", "\n".join(mixto[:5]),
+                        ["https://developer.mozilla.org/es/docs/Web/Security/Mixed_content"])
+
+        for form in html.css("form"):
+            accion = form.attributes.get("action") or ""
+            if form.css_first("input[type=password]") and (accion.startswith("http://") or not sitio.es_https):
+                agregar("Formulario con contraseña se envía sin cifrar", Severidad.ALTA,
+                        "La contraseña viaja en texto plano y puede ser capturada en la red.",
+                        "Servir la página y el destino del formulario solo por HTTPS.", f"action={accion or '(misma página)'}")
+                break
+
+        for n in html.css("script[src]"):
+            m = JQUERY.search(n.attributes.get("src") or "")
+            if m and tuple(map(int, m.groups())) < (3, 5, 0):
+                agregar(f"jQuery {'.'.join(m.groups())} tiene fallas XSS conocidas", Severidad.MEDIA,
+                        "Las versiones de jQuery anteriores a 3.5.0 permiten XSS al insertar HTML (CVE-2020-11022, CVE-2020-11023).",
+                        "Actualizar jQuery a la versión 3.5.0 o superior.", n.attributes.get("src"),
+                        ["https://nvd.nist.gov/vuln/detail/CVE-2020-11022"])
+                break
+        return h

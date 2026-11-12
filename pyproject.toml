@@ -1,0 +1,34 @@
+[project]
+name = "escaner-web"
+version = "0.1.0"
+description = "Escáner de vulnerabilidades web (solo para sitios propios o autorizados)"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "selectolax>=1.0",
+    "typer>=0.12",
+    "rich>=13",
+    "jinja2>=3.1",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+escaner = "escaner.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["escaner*"]
+
+[tool.setuptools.package-data]
+escaner = ["reportes/plantillas/*.j2"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

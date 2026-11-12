@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reporte de seguridad · {{ r.objetivo }}</title>
+<style>
+  :root { --fondo:#f5f6f8; --carta:#fff; --texto:#1d2330; --suave:#5d6677; --borde:#e2e5ea;
+          --critica:#7a1020; --alta:#d1343e; --media:#e08a14; --baja:#2f6fb3; --info:#6b7280; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; background:var(--fondo); color:var(--texto); }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .meta { color:var(--suave); font-size:13px; margin-bottom:24px; word-break:break-all; }
+  .resumen { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:28px; }
+  .chip { flex:1 1 110px; background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:12px 14px; }
+  .chip b { display:block; font-size:26px; line-height:1.1; }
+  .chip span { font-size:13px; color:var(--suave); }
+  .hallazgo { background:var(--carta); border:1px solid var(--borde); border-left:5px solid var(--c); border-radius:10px; padding:16px 18px; margin-bottom:14px; }
+  .hallazgo h2 { font-size:17px; margin:0 0 6px; }
+  .sev { display:inline-block; font-size:12px; font-weight:600; color:#fff; background:var(--c); border-radius:20px; padding:1px 10px; margin-right:8px; vertical-align:2px; }
+  .url { font-size:13px; color:var(--suave); word-break:break-all; margin-bottom:8px; }
+  .etq { font-weight:600; }
+  pre { background:#f0f2f5; border-radius:8px; padding:10px 12px; font-size:12.5px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; margin:8px 0; }
+  a { color:var(--baja); }
+  .refs { font-size:13px; }
+  .vacio { background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:24px; text-align:center; color:var(--suave); }
+  .errores { margin-top:28px; font-size:13px; color:var(--suave); }
+  .s4 { --c:var(--critica); } .s3 { --c:var(--alta); } .s2 { --c:var(--media); } .s1 { --c:var(--baja); } .s0 { --c:var(--info); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reporte de seguridad</h1>
+  <div class="meta">
+    {{ r.objetivo }} · {{ r.inicio.strftime("%Y-%m-%d %H:%M") }} UTC ·
+    {{ r.peticiones }} peticiones ·
+    {% if r.fin %}{{ "%.1f"|format((r.fin - r.inicio).total_seconds()) }} s{% endif %}
+  </div>
+
+  <div class="resumen">
+    {% for s in Severidad|reverse %}
+    <div class="chip s{{ s.value }}" style="border-top:4px solid var(--c)"><b>{{ conteo[s] }}</b><span>{{ s.etiqueta }}</span></div>
+    {% endfor %}
+  </div>
+
+  {% for h in r.hallazgos %}
+  <section class="hallazgo s{{ h.severidad.value }}">
+    <h2><span class="sev">{{ h.severidad.etiqueta }}</span>{{ h.titulo }}</h2>
+    <div class="url">{{ h.url }}</div>
+    <p>{{ h.descripcion }}</p>
+    {% if h.evidencia %}<div class="etq">Evidencia</div><pre>{{ h.evidencia }}</pre>{% endif %}
+    <p><span class="etq">Cómo arreglarlo:</span> {{ h.recomendacion }}</p>
+    {% if h.referencias %}
+    <div class="refs">Más información:
+      {% for ref in h.referencias %}<a href="{{ ref }}" target="_blank" rel="noopener">{{ ref.split('/')[2] }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+  </section>
+  {% else %}
+  <div class="vacio">No se encontraron problemas con las revisiones de esta versión.</div>
+  {% endfor %}
+
+  {% if r.errores %}
+  <div class="errores"><b>Revisiones que no pudieron completarse:</b>
+    <ul>{% for e in r.errores %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+</main>
+</body>
+</html>
