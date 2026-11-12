@@ -35,6 +35,30 @@ class Hallazgo(BaseModel):
     referencias: list[str] = Field(default_factory=list)
 
 
+class Campo(BaseModel):
+    nombre: str
+    tipo: str
+
+
+class Formulario(BaseModel):
+    pagina: str
+    accion: str
+    metodo: str
+    campos: list[Campo] = Field(default_factory=list)
+    # Sin method ni action en el HTML casi siempre lo envía JavaScript (apps React, Flutter, etc.).
+    metodo_declarado: bool = True
+    accion_declarada: bool = True
+
+
+class Mapa(BaseModel):
+    """Lo que encontró el rastreador."""
+
+    paginas: list[str] = Field(default_factory=list)
+    formularios: list[Formulario] = Field(default_factory=list)
+    parametros: dict[str, list[str]] = Field(default_factory=dict)  # URL sin query -> nombres de parámetros
+    omitidas: list[str] = Field(default_factory=list)  # enlaces que no se abrieron por parecer peligrosos
+
+
 class Resultado(BaseModel):
     objetivo: str
     inicio: datetime
@@ -42,6 +66,7 @@ class Resultado(BaseModel):
     peticiones: int = 0
     hallazgos: list[Hallazgo] = Field(default_factory=list)
     errores: list[str] = Field(default_factory=list)
+    mapa: Mapa | None = None
 
     def conteo(self) -> dict[Severidad, int]:
         cuenta = {s: 0 for s in Severidad}

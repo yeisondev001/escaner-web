@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reporte de seguridad · https://tienda.demo.test/</title>
+<style>
+  :root { --fondo:#f5f6f8; --carta:#fff; --texto:#1d2330; --suave:#5d6677; --borde:#e2e5ea;
+          --critica:#7a1020; --alta:#d1343e; --media:#e08a14; --baja:#2f6fb3; --info:#6b7280; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; background:var(--fondo); color:var(--texto); }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .meta { color:var(--suave); font-size:13px; margin-bottom:24px; word-break:break-all; }
+  .resumen { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:28px; }
+  .chip { flex:1 1 110px; background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:12px 14px; }
+  .chip b { display:block; font-size:26px; line-height:1.1; }
+  .chip span { font-size:13px; color:var(--suave); }
+  .hallazgo { background:var(--carta); border:1px solid var(--borde); border-left:5px solid var(--c); border-radius:10px; padding:16px 18px; margin-bottom:14px; }
+  .hallazgo h2 { font-size:17px; margin:0 0 6px; }
+  .sev { display:inline-block; font-size:12px; font-weight:600; color:#fff; background:var(--c); border-radius:20px; padding:1px 10px; margin-right:8px; vertical-align:2px; }
+  .url { font-size:13px; color:var(--suave); word-break:break-all; margin-bottom:8px; }
+  .etq { font-weight:600; }
+  pre { background:#f0f2f5; border-radius:8px; padding:10px 12px; font-size:12.5px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; margin:8px 0; }
+  a { color:var(--baja); }
+  .refs { font-size:13px; }
+  .vacio { background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:24px; text-align:center; color:var(--suave); }
+  .errores { margin-top:28px; font-size:13px; color:var(--suave); }
+  .seccion { font-size:18px; margin:32px 0 12px; }
+  .mapa { background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:6px 18px; font-size:13.5px; }
+  .mapa details { border-bottom:1px solid var(--borde); padding:10px 0; }
+  .mapa details:last-child { border-bottom:0; }
+  .mapa summary { cursor:pointer; font-weight:600; }
+  .mapa ul { margin:8px 0 0; padding-left:20px; word-break:break-all; }
+  .s4 { --c:var(--critica); } .s3 { --c:var(--alta); } .s2 { --c:var(--media); } .s1 { --c:var(--baja); } .s0 { --c:var(--info); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reporte de seguridad</h1>
+  <div class="meta">
+    https://tienda.demo.test/ · 2026-11-12 16:57 UTC ·
+    19 peticiones ·
+    0.0 s
+  </div>
+
+  <div class="resumen">
+    
+    <div class="chip s4" style="border-top:4px solid var(--c)"><b>2</b><span>Crítica</span></div>
+    
+    <div class="chip s3" style="border-top:4px solid var(--c)"><b>3</b><span>Alta</span></div>
+    
+    <div class="chip s2" style="border-top:4px solid var(--c)"><b>8</b><span>Media</span></div>
+    
+    <div class="chip s1" style="border-top:4px solid var(--c)"><b>5</b><span>Baja</span></div>
+    
+    <div class="chip s0" style="border-top:4px solid var(--c)"><b>1</b><span>Info</span></div>
+    
+  </div>
+
+  
+  <section class="hallazgo s4">
+    <h2><span class="sev">Crítica</span>Archivo .env expuesto</h2>
+    <div class="url">https://tienda.demo.test/.env</div>
+    <p>El .env suele tener contraseñas de base de datos, llaves de API y secretos.</p>
+    <div class="etq">Evidencia</div><pre>APP_KEY=***
+DB_PASSWORD=***</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Borrar el archivo del servidor o bloquear su acceso, y cambiar cualquier contraseña o llave que contenga.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s4">
+    <h2><span class="sev">Crítica</span>Repositorio Git expuesto</h2>
+    <div class="url">https://tienda.demo.test/.git/HEAD</div>
+    <p>Se puede descargar el código fuente completo del sitio, incluido su historial y posibles contraseñas.</p>
+    <div class="etq">Evidencia</div><pre>ref: ***</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Borrar el archivo del servidor o bloquear su acceso, y cambiar cualquier contraseña o llave que contenga.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s3">
+    <h2><span class="sev">Alta</span>CORS acepta cualquier origen con credenciales (Origin: https://origen-de-prueba.invalid)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Cualquier página puede leer las respuestas de este sitio usando la sesión del visitante.</p>
+    <div class="etq">Evidencia</div><pre>Access-Control-Allow-Origin: https://origen-de-prueba.invalid
+Access-Control-Allow-Credentials: true</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Responder Access-Control-Allow-Origin solo con una lista fija de dominios de confianza.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://portswigger.net/web-security/cors" target="_blank" rel="noopener">portswigger.net</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s3">
+    <h2><span class="sev">Alta</span>CORS acepta cualquier origen con credenciales (Origin: null)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Cualquier página puede leer las respuestas de este sitio usando la sesión del visitante.</p>
+    <div class="etq">Evidencia</div><pre>Access-Control-Allow-Origin: null
+Access-Control-Allow-Credentials: true</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Responder Access-Control-Allow-Origin solo con una lista fija de dominios de confianza.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://portswigger.net/web-security/cors" target="_blank" rel="noopener">portswigger.net</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s3">
+    <h2><span class="sev">Alta</span>Formulario envía la contraseña en la URL (method=GET)</h2>
+    <div class="url">https://tienda.demo.test/contacto</div>
+    <p>La contraseña queda en el historial del navegador, en los registros del servidor y en la cabecera Referer.</p>
+    <div class="etq">Evidencia</div><pre>GET https://tienda.demo.test/entrar
+Campos: usuario (text), clave (password)</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Usar method=&#34;POST&#34; en el formulario.</p>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>El sitio se puede meter dentro de un iframe (clickjacking)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Sin X-Frame-Options ni frame-ancestors, otra página puede mostrar este sitio oculto y engañar al usuario para que haga clic.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Enviar X-Frame-Options: DENY (o SAMEORIGIN), o en la CSP: frame-ancestors &#39;none&#39;.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Falta Content-Security-Policy (CSP)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Sin CSP, si hay una falla de XSS el navegador ejecuta cualquier script inyectado.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Definir una política, por ejemplo: default-src &#39;self&#39;; y ajustar según los recursos que use el sitio.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Falta Strict-Transport-Security (HSTS)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Sin HSTS, un atacante en la misma red puede forzar al navegador a usar HTTP en la primera visita.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Enviar: Strict-Transport-Security: max-age=31536000; includeSubDomains</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Cookie sin HttpOnly: PHPSESSID</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>JavaScript puede leer la cookie; con una falla de XSS se puede robar la sesión.</p>
+    <div class="etq">Evidencia</div><pre>PHPSESSID=***; path=/</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Agregar HttpOnly si el JavaScript del sitio no necesita leerla.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://developer.mozilla.org/es/docs/Web/HTTP/Cookies#restringir_el_acceso_a_las_cookies" target="_blank" rel="noopener">developer.mozilla.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Cookie sin Secure: PHPSESSID</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>La cookie también se envía por HTTP sin cifrar, donde se puede robar.</p>
+    <div class="etq">Evidencia</div><pre>PHPSESSID=***; path=/</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Agregar el atributo Secure.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://developer.mozilla.org/es/docs/Web/HTTP/Cookies#restringir_el_acceso_a_las_cookies" target="_blank" rel="noopener">developer.mozilla.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Contenido mixto (recursos por HTTP en una página HTTPS)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Scripts o estilos cargados sin cifrar pueden ser modificados en el camino.</p>
+    <div class="etq">Evidencia</div><pre>http://cdn.demo.test/jquery-1.12.4.min.js</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Cargar todos los recursos por https://.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://developer.mozilla.org/es/docs/Web/Security/Mixed_content" target="_blank" rel="noopener">developer.mozilla.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>jQuery 1.12.4 tiene fallas XSS conocidas</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Las versiones de jQuery anteriores a 3.5.0 permiten XSS al insertar HTML (CVE-2020-11022, CVE-2020-11023).</p>
+    <div class="etq">Evidencia</div><pre>http://cdn.demo.test/jquery-1.12.4.min.js</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Actualizar jQuery a la versión 3.5.0 o superior.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://nvd.nist.gov/vuln/detail/CVE-2020-11022" target="_blank" rel="noopener">nvd.nist.gov</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s2">
+    <h2><span class="sev">Media</span>Formulario POST sin token anti-CSRF</h2>
+    <div class="url">https://tienda.demo.test/contacto</div>
+    <p>Otro sitio podría enviar este formulario en nombre de un usuario con sesión iniciada (CSRF). Si el sitio protege de otra forma (cookies SameSite=Strict, cabeceras), puede no aplicar.</p>
+    <div class="etq">Evidencia</div><pre>POST https://tienda.demo.test/enviar
+Campos: nombre (text), email (text), mensaje (textarea)</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Agregar un token anti-CSRF por sesión en un campo oculto y validarlo en el servidor.</p>
+    
+    <div class="refs">Más información:
+      <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html" target="_blank" rel="noopener">cheatsheetseries.owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s1">
+    <h2><span class="sev">Baja</span>Falta Referrer-Policy</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Las URLs completas (con parámetros) pueden filtrarse a otros sitios en la cabecera Referer.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Enviar: Referrer-Policy: strict-origin-when-cross-origin</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s1">
+    <h2><span class="sev">Baja</span>Falta X-Content-Type-Options: nosniff</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>El navegador puede adivinar el tipo de un archivo y ejecutarlo como script.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Enviar: X-Content-Type-Options: nosniff</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s1">
+    <h2><span class="sev">Baja</span>Cookie sin SameSite: PHPSESSID</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Sin SameSite la cookie viaja en peticiones desde otros sitios, lo que facilita ataques CSRF.</p>
+    <div class="etq">Evidencia</div><pre>PHPSESSID=***; path=/</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Agregar SameSite=Lax (o Strict).</p>
+    
+    <div class="refs">Más información:
+      <a href="https://developer.mozilla.org/es/docs/Web/HTTP/Cookies#restringir_el_acceso_a_las_cookies" target="_blank" rel="noopener">developer.mozilla.org</a>
+    </div>
+    
+  </section>
+  
+  <section class="hallazgo s1">
+    <h2><span class="sev">Baja</span>El servidor revela su software (server)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Conocer la versión exacta ayuda a un atacante a buscar fallas conocidas para ese software.</p>
+    <div class="etq">Evidencia</div><pre>server: Apache/2.4.41 (Ubuntu)</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Quitar la cabecera o la versión (por ejemplo, server_tokens off en nginx, expose_php = Off en PHP).</p>
+    
+  </section>
+  
+  <section class="hallazgo s1">
+    <h2><span class="sev">Baja</span>El servidor revela su software (x-powered-by)</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>Conocer la versión exacta ayuda a un atacante a buscar fallas conocidas para ese software.</p>
+    <div class="etq">Evidencia</div><pre>x-powered-by: PHP/7.4.3</pre>
+    <p><span class="etq">Cómo arreglarlo:</span> Quitar la cabecera o la versión (por ejemplo, server_tokens off en nginx, expose_php = Off en PHP).</p>
+    
+  </section>
+  
+  <section class="hallazgo s0">
+    <h2><span class="sev">Info</span>Falta Permissions-Policy</h2>
+    <div class="url">https://tienda.demo.test/</div>
+    <p>No se restringe el acceso a cámara, micrófono, ubicación, etc. desde el sitio o sus iframes.</p>
+    
+    <p><span class="etq">Cómo arreglarlo:</span> Enviar por ejemplo: Permissions-Policy: camera=(), microphone=(), geolocation=()</p>
+    
+    <div class="refs">Más información:
+      <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener">owasp.org</a>
+    </div>
+    
+  </section>
+  
+
+  
+  <h2 class="seccion">Mapa del sitio</h2>
+  <div class="mapa">
+    <details>
+      <summary>2 páginas recorridas</summary>
+      <ul><li>https://tienda.demo.test/</li><li>https://tienda.demo.test/contacto</li></ul>
+    </details>
+    <details>
+      <summary>2 formularios</summary>
+      
+      <pre>POST https://tienda.demo.test/enviar
+Página: https://tienda.demo.test/contacto
+Campos: nombre (text), email (text), mensaje (textarea)</pre>
+      
+      <pre>GET https://tienda.demo.test/entrar
+Página: https://tienda.demo.test/contacto
+Campos: usuario (text), clave (password)</pre>
+      
+    </details>
+    <details>
+      <summary>0 URLs con parámetros</summary>
+      <ul></ul>
+    </details>
+    
+    <details>
+      <summary>1 enlaces no abiertos (parecen cerrar sesión o borrar algo)</summary>
+      <ul><li>https://tienda.demo.test/salir</li></ul>
+    </details>
+    
+  </div>
+  
+
+  
+</main>
+</body>
+</html>

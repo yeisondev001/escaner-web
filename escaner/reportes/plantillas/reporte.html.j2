@@ -26,6 +26,12 @@
   .refs { font-size:13px; }
   .vacio { background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:24px; text-align:center; color:var(--suave); }
   .errores { margin-top:28px; font-size:13px; color:var(--suave); }
+  .seccion { font-size:18px; margin:32px 0 12px; }
+  .mapa { background:var(--carta); border:1px solid var(--borde); border-radius:10px; padding:6px 18px; font-size:13.5px; }
+  .mapa details { border-bottom:1px solid var(--borde); padding:10px 0; }
+  .mapa details:last-child { border-bottom:0; }
+  .mapa summary { cursor:pointer; font-weight:600; }
+  .mapa ul { margin:8px 0 0; padding-left:20px; word-break:break-all; }
   .s4 { --c:var(--critica); } .s3 { --c:var(--alta); } .s2 { --c:var(--media); } .s1 { --c:var(--baja); } .s0 { --c:var(--info); }
 </style>
 </head>
@@ -60,6 +66,34 @@
   {% else %}
   <div class="vacio">No se encontraron problemas con las revisiones de esta versión.</div>
   {% endfor %}
+
+  {% if r.mapa %}
+  <h2 class="seccion">Mapa del sitio</h2>
+  <div class="mapa">
+    <details>
+      <summary>{{ r.mapa.paginas|length }} páginas recorridas</summary>
+      <ul>{% for p in r.mapa.paginas %}<li>{{ p }}</li>{% endfor %}</ul>
+    </details>
+    <details>
+      <summary>{{ r.mapa.formularios|length }} formularios</summary>
+      {% for f in r.mapa.formularios %}
+      <pre>{{ f.metodo }} {{ f.accion }}
+Página: {{ f.pagina }}
+Campos: {% for c in f.campos %}{{ c.nombre }} ({{ c.tipo }}){% if not loop.last %}, {% endif %}{% else %}(ninguno){% endfor %}</pre>
+      {% endfor %}
+    </details>
+    <details>
+      <summary>{{ r.mapa.parametros|length }} URLs con parámetros</summary>
+      <ul>{% for url, nombres in r.mapa.parametros.items() %}<li>{{ url }} → {{ nombres|join(", ") }}</li>{% endfor %}</ul>
+    </details>
+    {% if r.mapa.omitidas %}
+    <details>
+      <summary>{{ r.mapa.omitidas|length }} enlaces no abiertos (parecen cerrar sesión o borrar algo)</summary>
+      <ul>{% for u in r.mapa.omitidas %}<li>{{ u }}</li>{% endfor %}</ul>
+    </details>
+    {% endif %}
+  </div>
+  {% endif %}
 
   {% if r.errores %}
   <div class="errores"><b>Revisiones que no pudieron completarse:</b>

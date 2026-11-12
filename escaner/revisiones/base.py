@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 from escaner.cliente import Cliente, Respuesta
-from escaner.modelos import Hallazgo
+from escaner.modelos import Hallazgo, Mapa
 
 
 @dataclass
@@ -12,6 +12,12 @@ class Sitio:
 
     url_pedida: str
     inicio: Respuesta  # respuesta de la página principal, después de redirecciones
+    paginas: list[Respuesta] = field(default_factory=list)  # todas las encontradas por el rastreador (incluye inicio)
+    mapa: Mapa | None = None
+
+    def __post_init__(self):
+        if not self.paginas:
+            self.paginas = [self.inicio]
 
     @property
     def url(self) -> str:

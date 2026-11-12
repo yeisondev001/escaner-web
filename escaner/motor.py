@@ -7,6 +7,7 @@ import httpx
 from escaner.alcance import Alcance
 from escaner.cliente import Cliente
 from escaner.modelos import Resultado
+from escaner.rastreador import Rastreador
 from escaner.revisiones import TODAS, Revision, Sitio
 
 
@@ -15,7 +16,10 @@ async def escanear(
     alcance: Alcance,
     revisiones: list[Revision] | None = None,
     por_segundo: float = 5.0,
+    max_paginas: int = 1,
+    max_profundidad: int = 3,
     al_terminar_revision: Callable[[Revision, int], None] | None = None,
+    al_rastrear: Callable[[int, int], None] | None = None,
     transporte: httpx.AsyncBaseTransport | None = None,
 ) -> Resultado:
     revisiones = TODAS if revisiones is None else revisiones
@@ -31,6 +35,11 @@ async def escanear(
             resultado.peticiones = cliente.peticiones
             return resultado
         sitio = Sitio(url_pedida=url, inicio=inicio)
+        if max_paginas > 1:
+            mapa, paginas = await Rastreador(cliente, max_paginas, max_profundidad).rastrear(inicio)
+            sitio.paginas, sitio.mapa, resultado.mapa = paginas, mapa, mapa
+            if al_rastrear:
+                al_rastrear(len(paginas), len(mapa.formularios))
 
         async def correr(rev: Revision) -> None:
             try:

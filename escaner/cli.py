@@ -23,6 +23,8 @@ def cmd_escanear(
     url: Annotated[str, typer.Argument(help="Sitio a revisar, por ejemplo https://misitio.com")],
     permitir: Annotated[list[str], typer.Option("--permitir", "-p", help="Otro dominio autorizado (se puede repetir; acepta *.dominio.com)")] = [],
     velocidad: Annotated[float, typer.Option(help="Máximo de peticiones por segundo")] = 5.0,
+    paginas: Annotated[int, typer.Option(help="Máximo de páginas a recorrer (1 = solo la principal)")] = 30,
+    profundidad: Annotated[int, typer.Option(help="Cuántos clics de distancia desde la página principal")] = 3,
     reporte: Annotated[Path, typer.Option(help="Archivo HTML del reporte")] = Path("reporte.html"),
     json_salida: Annotated[Path | None, typer.Option("--json", help="Guardar también el resultado en JSON")] = None,
     solo: Annotated[list[str], typer.Option(help="Correr solo estas revisiones (ver: escaner revisiones)")] = [],
@@ -51,18 +53,24 @@ def cmd_escanear(
     def avance(rev, n):
         consola.print(f"  [green]✓[/green] {rev.nombre} [dim]({n} hallazgos)[/dim]")
 
+    def rastreo(n_paginas, n_formularios):
+        consola.print(f"  [green]✓[/green] Rastreo [dim]({n_paginas} páginas, {n_formularios} formularios)[/dim]")
+
     consola.print(f"Escaneando [bold]{url}[/bold] con {len(revisiones)} revisiones…")
     try:
-        resultado = asyncio.run(escanear(url, alcance, revisiones, por_segundo=velocidad, al_terminar_revision=avance))
+        resultado = asyncio.run(escanear(url, alcance, revisiones, por_segundo=velocidad, max_paginas=paginas,
+                                         max_profundidad=profundidad, al_terminar_revision=avance, al_rastrear=rastreo))
     except FueraDeAlcance as e:
         consola.print(f"[red]{e}[/red]")
         raise typer.Exit(2)
 
-    _resumen(resultado)
+    # Primero se guardan los archivos: si la consola se corta (por ejemplo con | head), el reporte ya está.
     reportes.html(resultado, reporte)
-    consola.print(f"\nReporte: [bold]{reporte.resolve()}[/bold]")
     if json_salida:
         reportes.json(resultado, json_salida)
+    _resumen(resultado)
+    consola.print(f"\nReporte: [bold]{reporte.resolve()}[/bold]")
+    if json_salida:
         consola.print(f"JSON: [bold]{json_salida.resolve()}[/bold]")
 
     if fallar_en:

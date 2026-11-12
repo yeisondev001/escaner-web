@@ -13,14 +13,17 @@ class Cookies(Revision):
 
     async def ejecutar(self, sitio: Sitio, cliente) -> list[Hallazgo]:
         h: list[Hallazgo] = []
-        for cruda in sitio.inicio.set_cookies:
+        vistas: set[str] = set()
+        cookies = [(p.url, c) for p in sitio.paginas for c in p.set_cookies]
+        for url, cruda in cookies:
             nombre, atributos = _leer(cruda)
-            if not nombre:
+            if not nombre or nombre in vistas:
                 continue
+            vistas.add(nombre)
             sesion = bool(PARECE_SESION.search(nombre))
 
             def agregar(titulo, severidad, descripcion, recomendacion):
-                h.append(Hallazgo(revision=self.id, titulo=f"{titulo}: {nombre}", severidad=severidad, url=sitio.url,
+                h.append(Hallazgo(revision=self.id, titulo=f"{titulo}: {nombre}", severidad=severidad, url=url,
                                   descripcion=descripcion, recomendacion=recomendacion,
                                   evidencia=_sin_valor(cruda), referencias=[REFERENCIA]))
 
